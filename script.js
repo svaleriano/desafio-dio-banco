@@ -18,6 +18,8 @@ let state = loadState();
 
 const els = {
   accountSelect: document.querySelector("#accountSelect"),
+  activeAccountNumber: document.querySelector("#activeAccountNumber"),
+  accountUser: document.querySelector("#accountUser"),
   balance: document.querySelector("#balance"),
   withdrawCount: document.querySelector("#withdrawCount"),
   userCount: document.querySelector("#userCount"),
@@ -31,10 +33,17 @@ const els = {
   userList: document.querySelector("#userList"),
   accountList: document.querySelector("#accountList"),
   clearStatement: document.querySelector("#clearStatement"),
+  resetData: document.querySelector("#resetData"),
 };
 
 document.querySelectorAll(".tab-button").forEach((button) => {
   button.addEventListener("click", () => setActiveTab(button.dataset.tab));
+});
+
+["#userName", "#userAddress"].forEach((selector) => {
+  document.querySelector(selector).addEventListener("blur", (event) => {
+    event.target.value = toTitleCase(event.target.value);
+  });
 });
 
 els.accountSelect.addEventListener("change", (event) => {
@@ -83,10 +92,10 @@ els.userForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const user = {
     id: createId(),
-    name: document.querySelector("#userName").value.trim(),
+    name: toTitleCase(document.querySelector("#userName").value),
     cpf: normalizeCpf(document.querySelector("#userCpf").value),
     birthDate: document.querySelector("#userBirth").value,
-    address: document.querySelector("#userAddress").value.trim(),
+    address: toTitleCase(document.querySelector("#userAddress").value),
   };
 
   if (!isValidCpf(user.cpf)) return showNotice("Informe um CPF com 11 números.", "error");
@@ -103,10 +112,10 @@ els.userForm.addEventListener("submit", (event) => {
 
 els.accountForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const cpf = normalizeCpf(document.querySelector("#accountCpf").value);
-  const user = state.users.find((item) => item.cpf === cpf);
+  const userCpf = els.accountUser.value;
+  const user = state.users.find((item) => item.cpf === userCpf);
 
-  if (!user) return showNotice("Usuário não encontrado. Cadastre o usuário antes de criar a conta.", "error");
+  if (!user) return showNotice("Cadastre um usuário antes de criar a conta.", "error");
 
   const nextNumber = state.accounts.length + 1;
   const account = {
@@ -123,7 +132,7 @@ els.accountForm.addEventListener("submit", (event) => {
   state.activeAccountId = account.id;
   persist();
   event.target.reset();
-  showNotice("Conta criada com sucesso.");
+  showNotice(`Conta criada para ${user.name}.`);
   render();
 });
 
@@ -134,6 +143,14 @@ els.clearStatement.addEventListener("click", () => {
   account.statement = [];
   persist();
   showNotice("Extrato limpo.");
+  render();
+});
+
+els.resetData.addEventListener("click", () => {
+  if (!confirm("Deseja apagar todos os usuários, contas, saldos e extratos?")) return;
+  state = { ...initialState };
+  localStorage.removeItem(STORAGE_KEY);
+  showNotice("Todos os dados foram apagados.");
   render();
 });
 
@@ -154,9 +171,12 @@ function persist() {
 
 function render() {
   renderAccountSelect();
+  renderAccountUserSelect();
+
   const activeAccount = getActiveAccount();
   els.balance.textContent = currency.format(activeAccount?.balance ?? 0);
   els.withdrawCount.textContent = activeAccount?.withdrawCount ?? 0;
+  els.activeAccountNumber.textContent = activeAccount ? `Conta ${activeAccount.number}` : "Sem conta";
   els.userCount.textContent = state.users.length;
   els.accountCount.textContent = state.accounts.length;
 
@@ -182,6 +202,19 @@ function renderAccountSelect() {
     .join("");
   els.accountSelect.value = state.activeAccountId ?? state.accounts[0].id;
   state.activeAccountId = els.accountSelect.value;
+}
+
+function renderAccountUserSelect() {
+  if (!state.users.length) {
+    els.accountUser.innerHTML = '<option value="">Cadastre um usuário primeiro</option>';
+    els.accountUser.disabled = true;
+    return;
+  }
+
+  els.accountUser.disabled = false;
+  els.accountUser.innerHTML = '<option value="">Selecione o titular</option>' + state.users
+    .map((user) => `<option value="${user.cpf}">${escapeHtml(user.name)} - ${formatCpf(user.cpf)}</option>`)
+    .join("");
 }
 
 function renderStatement(account) {
@@ -305,6 +338,16 @@ function formatCpf(cpf) {
 function formatDate(date) {
   if (!date) return "";
   return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(date));
+}
+
+function toTitleCase(value) {
+  return value
+    .trim()
+    .toLocaleLowerCase("pt-BR")
+    .replace(/\s+/g, " ")
+    .replace(/(^|[\s/-])(\p{L})/gu, (match, separator, letter) => {
+      return separator + letter.toLocaleUpperCase("pt-BR");
+    });
 }
 
 function escapeHtml(value) {
