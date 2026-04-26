@@ -1,11 +1,122 @@
- <meta charset="utf-8" />
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Banco Digital</title>
-    <link rel="stylesheet" href="/styles.css?v=20260426-2" />
     <link rel="stylesheet" href="/styles.css?v=20260426-3" />
   </head>
   <body>
     <main class="bank-app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">BD</div>
+          <div>
+            <p>Banco Digital</p>
+            <strong>Minha conta</strong>
+          </div>
+        </div>
+
+        <label class="field account-picker" for="accountSelect">
+          Conta ativa
+          <select id="accountSelect"></select>
+        </label>
+
+        <section class="bank-card" aria-label="Cartão da conta">
+          <div class="card-top">
+            <span>Saldo disponível</span>
+            <strong>Conta corrente</strong>
+          </div>
+          <p id="balance">R$ 0,00</p>
+          <div class="card-bottom">
+            <span>Agência 0001</span>
+            <span id="activeAccountNumber">Sem conta</span>
+          </div>
+        </section>
+
+        <dl class="stats-grid">
+          <div>
+            <dt>Saques hoje</dt>
+            <dd><span id="withdrawCount">0</span>/3</dd>
+          </div>
+          <div>
+            <dt>Limite</dt>
+            <dd>R$ 500,00</dd>
+          </div>
+          <div>
+            <dt>Usuários</dt>
+            <dd id="userCount">0</dd>
+          </div>
+          <div>
+            <dt>Contas</dt>
+            <dd id="accountCount">0</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <section class="content">
+        <header class="topbar">
+          <div>
+            <p>Olá</p>
+            <h1>Central bancária</h1>
+          </div>
+          <button class="danger-button" id="resetData" type="button">Limpar dados</button>
+        </header>
+
+        <nav class="tabs" aria-label="Operações">
+          <button class="tab-button active" data-tab="movimentar" type="button">Movimentar</button>
+          <button class="tab-button" data-tab="extrato" type="button">Extrato</button>
+          <button class="tab-button" data-tab="usuarios" type="button">Usuários</button>
+          <button class="tab-button" data-tab="contas" type="button">Contas</button>
+        </nav>
+
+        <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+        <section class="tab-panel active" id="movimentar">
+          <div class="form-grid">
+            <form class="panel" id="depositForm">
+              <h2>Depositar</h2>
+              <label class="field" for="depositAmount">
+                Valor
+                <input id="depositAmount" min="0.01" step="0.01" type="number" placeholder="0,00" required />
+              </label>
+              <button class="primary-button" type="submit">Depositar</button>
+            </form>
+
+            <form class="panel" id="withdrawForm">
+              <h2>Sacar</h2>
+              <label class="field" for="withdrawAmount">
+                Valor
+                <input id="withdrawAmount" min="0.01" step="0.01" type="number" placeholder="0,00" required />
+              </label>
+              <button class="primary-button" type="submit">Sacar</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="extrato">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Extrato</h2>
+              <button class="ghost-button" id="clearStatement" type="button">Limpar extrato</button>
+            </div>
+            <ul class="statement-list" id="statementList"></ul>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="usuarios">
+          <form class="panel" id="userForm">
+            <h2>Novo usuário</h2>
+            <div class="form-grid">
+              <label class="field" for="userName">
+                Nome completo
+                <input id="userName" autocomplete="name" required />
+              </label>
+              <label class="field" for="userCpf">
+                CPF
+                <input id="userCpf" inputmode="numeric" maxlength="14" placeholder="Somente números" required />
+              </label>
+              <label class="field" for="userBirth">
                 Data de nascimento
                 <input id="userBirth" type="date" required />
               </label>
@@ -23,15 +134,37 @@
               </label>
               <label class="field" for="userAddress">
                 Endereço
-                <input id="userAddress" placeholder="Rua, número - bairro - cidade/UF" required />
                 <input id="userAddress" placeholder="Preenchido automaticamente pelo CEP" required />
               </label>
             </div>
             <button class="primary-button" type="submit">Criar usuário</button>
+          </form>
+
+          <div class="panel">
+            <h2>Usuários cadastrados</h2>
+            <ul class="data-list" id="userList"></ul>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="contas">
+          <form class="panel" id="accountForm">
+            <h2>Nova conta</h2>
+            <label class="field" for="accountUser">
+              Titular
+              <select id="accountUser" required></select>
+            </label>
+            <button class="primary-button" type="submit">Criar conta</button>
+          </form>
+
+          <div class="panel">
+            <h2>Contas cadastradas</h2>
+            <ul class="data-list" id="accountList"></ul>
+          </div>
+        </section>
       </section>
     </main>
 
-    <script src="/script.js?v=20260426-2"></script>
     <script src="/script.js?v=20260426-3"></script>
   </body>
+</html>
 </html>
