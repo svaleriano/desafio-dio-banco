@@ -7,22 +7,32 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="summary-panel" aria-label="Resumo da conta">
-        <div>
-          <p class="eyebrow">Banco Digital</p>
-          <h1>Controle de contas</h1>
+    <main class="bank-app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">BD</div>
+          <div>
+            <p>Banco Digital</p>
+            <strong>Minha conta</strong>
+          </div>
         </div>
 
-        <label class="field field-compact" for="accountSelect">
+        <label class="field account-picker" for="accountSelect">
           Conta ativa
           <select id="accountSelect"></select>
         </label>
 
-        <div class="balance-box">
-          <span>Saldo disponível</span>
-          <strong id="balance">R$ 0,00</strong>
-        </div>
+        <section class="bank-card" aria-label="Cartão da conta">
+          <div class="card-top">
+            <span>Saldo disponível</span>
+            <strong>Conta corrente</strong>
+          </div>
+          <p id="balance">R$ 0,00</p>
+          <div class="card-bottom">
+            <span>Agência 0001</span>
+            <span id="activeAccountNumber">Sem conta</span>
+          </div>
+        </section>
 
         <dl class="stats-grid">
           <div>
@@ -30,7 +40,7 @@
             <dd><span id="withdrawCount">0</span>/3</dd>
           </div>
           <div>
-            <dt>Limite por saque</dt>
+            <dt>Limite</dt>
             <dd>R$ 500,00</dd>
           </div>
           <div>
@@ -42,9 +52,17 @@
             <dd id="accountCount">0</dd>
           </div>
         </dl>
-      </section>
+      </aside>
 
-      <section class="workspace">
+      <section class="content">
+        <header class="topbar">
+          <div>
+            <p>Olá</p>
+            <h1>Central bancária</h1>
+          </div>
+          <button class="danger-button" id="resetData" type="button">Limpar dados</button>
+        </header>
+
         <nav class="tabs" aria-label="Operações">
           <button class="tab-button active" data-tab="movimentar" type="button">Movimentar</button>
           <button class="tab-button" data-tab="extrato" type="button">Extrato</button>
@@ -104,7 +122,7 @@
               </label>
               <label class="field" for="userAddress">
                 Endereço
-                <input id="userAddress" placeholder="logradouro, nro - bairro - cidade/UF" required />
+                <input id="userAddress" placeholder="Rua, número - bairro - cidade/UF" required />
               </label>
             </div>
             <button class="primary-button" type="submit">Criar usuário</button>
@@ -119,9 +137,9 @@
         <section class="tab-panel" id="contas">
           <form class="panel" id="accountForm">
             <h2>Nova conta</h2>
-            <label class="field" for="accountCpf">
-              CPF do titular
-              <input id="accountCpf" inputmode="numeric" maxlength="14" placeholder="Somente números" required />
+            <label class="field" for="accountUser">
+              Titular
+              <select id="accountUser" required></select>
             </label>
             <button class="primary-button" type="submit">Criar conta</button>
           </form>
